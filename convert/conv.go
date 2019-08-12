@@ -15,6 +15,7 @@ func init() {
 	resolve.AllowFloat = true     // allow floating point literals, the 'float' built-in, and x / y
 	resolve.AllowSet = true       // allow the 'set' built-in
 	resolve.AllowBitwise = true   // allow bitwise operands
+	resolve.AllowRecursion = true // allow while statements and recursive functions
 }
 
 // ToValue attempts to convert the given value to a starlark.Value.  It supports
@@ -49,6 +50,9 @@ func toValue(val reflect.Value) (starlark.Value, error) {
 	}
 
 	kind := val.Kind()
+	if kind == reflect.Interface {
+		return toValue(val.Elem())
+	}
 	if kind == reflect.Ptr {
 		kind = val.Elem().Kind()
 	}
